@@ -1,0 +1,67 @@
+general {
+	output_format = "i3bar"
+	colors = true
+	interval = 5
+}
+
+order += "disk /"
+order += "memory"
+order += "cpu_usage"
+order += "load"
+order += "tztime local"
+order += "tztime budapest"
+order += "tztime berlin"
+order += "tztime bucharest"
+order += "tztime london"
+
+cpu_usage {
+	format = "cpu: %usage"
+}
+
+ethernet enp0s3 {
+        format_up = "E: %ip (%speed)"
+        format_down = "E: down"
+}
+
+memory {
+        format = "memory: used = %used, free = %free"
+        threshold_degraded = "10%"
+        format_degraded = "MEMORY: %free"
+}
+
+load {
+        format = "load: 1min = %1min, 5min = %5min"
+}
+
+disk "/" {
+        format = "storage: used = %used, free = %free"
+}
+
+tztime local {
+        format = "Toronto: %Y-%m-%d %H:%M:%S"
+	timezone = "America/Toronto"
+        hide_if_equals_localtime = false
+}
+
+tztime budapest {
+        format = "Budapest: %Y-%m-%d %H:%M:%S %Z"
+        timezone = "Europe/Budapest"
+}
+
+tztime berlin {
+        format = "Berlin: %Y-%m-%d %H:%M:%S %Z"
+        timezone = "Europe/Berlin"
+}
+
+tztime london {
+        format = "London: %Y-%m-%d %H:%M:%S %Z"
+        timezone = "Europe/London"
+}
+
+tztime bucharest {
+        format = "Bucharest: %Y-%m-%d %H:%M:%S %Z"
+        timezone = "Europe/Bucharest"
+}
+
+
+
