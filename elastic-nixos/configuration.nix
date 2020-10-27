@@ -280,6 +280,10 @@ end
       recursive = true;
     };
 
+    home.file.".Xresources" = {
+      source = ./.Xresources;
+    };
+
     # does not really work for a simple shell.nix
     # it's easier to use a simple shell script (see above) with a shell hook
     # that starts the nix-shell if we are not in a nix-shell already
