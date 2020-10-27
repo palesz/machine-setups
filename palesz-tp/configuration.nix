@@ -238,7 +238,6 @@ with import <nixpkgs> {};
       vlc
       nomacs
       slack
-      obs-studio
       ffmpeg
       # Android development - https://nixos.wiki/wiki/Android
       # android-studio
@@ -246,7 +245,6 @@ with import <nixpkgs> {};
       qbittorrent
       qpdfview
       hexchat
-      skypeforlinux
       libreoffice
       # python with a custom package list
       (
@@ -343,7 +341,7 @@ with import <nixpkgs> {};
         "/etc/nixos"
       ];
       repository = "/syno/archive/restic_repo";
-      passwordFile = ./secrets/restic-password;
+      passwordFile = toString ./secrets/restic-password;
       user = "root";
       extraBackupArgs = [
         "--exclude-if-present=.restic_skip"

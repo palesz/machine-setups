@@ -7,27 +7,27 @@ with lib;
     type = types.attrsOf (types.submodule ({ name, ... }: {
       options = {
         user = mkOption {
-	  type = types.str;
-	  description = ''The user to run the backup script with.'';
-	  default = "root";
-	};
+          type = types.str;
+          description = ''The user to run the backup script with.'';
+          default = "root";
+        };
         email = mkOption {
-	  type = types.str;
-	  description = ''The Bitwarden e-mail address (account).'';
-	};
+          type = types.str;
+          description = ''The Bitwarden e-mail address (account).'';
+        };
         passwordFile = mkOption {
-	  type = types.str;
-	  description = ''The file that stores the password for the Bitwarden account.'';
-	};
+	        type = types.path;
+	        description = ''The file that stores the password for the Bitwarden account.'';
+        };
         outputFile = mkOption {
-	  type = types.str;
-	  description = ''The location where the Bitwarden output should be saved to.'';
-	};
+          type = types.str;
+          description = ''The location where the Bitwarden output should be saved to.'';
+        };
         format = mkOption {
-	  type = types.str;
-	  description = ''The format of the Bitwarden output. json or csv'';
-	  default = "json";
-	};
+          type = types.str;
+          description = ''The format of the Bitwarden output. json or csv'';
+        default = "json";
+        };
       };
     }));
     default = {};
@@ -39,22 +39,22 @@ with lib;
         exportScript = builtins.toFile "bitwarden-export-script.sh" ''
         #!/bin/sh
         set -e
-	
+
         # set the path to the cli and the APPDATA_DIR
         bw=$1
-	email="$2"
-	passwordFile="$3"
-	outputFile="$4"
-	format=$5
-	
+	      email="$2"
+	      passwordFile="$3"
+        outputFile="$4"
+        format=$5
+
         export BITWARDENCLI_APPDATA_DIR="$HOME/.config/bitwarden-export-script/$email"
 
         # login if required
-        the_password=`cat $passwordFile` 
+        the_password=`cat $passwordFile`
         $bw --nointeraction login --check || $bw --nointeraction login $email "$the_password"
         # unlock if required
         $bw --nointeraction unlock --check || export BW_SESSION=`$bw --nointeraction unlock "$the_password" --raw`
-      
+
         # create the output directory
         mkdir -p `dirname $outputFile`
 
