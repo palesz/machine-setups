@@ -149,7 +149,7 @@ with import <nixpkgs> {};
   # Enable sound.
   # sound.enable = true;
   # hardware.pulseaudio.enable = true;
-  
+
   # xrdp access
   services.xrdp.enable = true;
   # services.xrdp.defaultWindowManager = "startplasma-x11";
@@ -267,12 +267,12 @@ with import <nixpkgs> {};
       pipenv
       unzip
     ];
-    
+
     programs.feh.enable = true;
 
     programs.fish.enable = true;
     programs.zsh.enable = true;
-    
+
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [
@@ -308,7 +308,7 @@ with import <nixpkgs> {};
     home.file.".git-credentials" = {
       source = ./secrets/.git-credentials;
     };
-    
+
     programs.vim = {
       enable = true;
       plugins = with pkgs.vimPlugins; [ vim-airline ];
@@ -318,7 +318,7 @@ with import <nixpkgs> {};
         relativenumber = true;
       };
     };
-    
+
     programs.git = {
       enable = true;
       userName = "palesz";
@@ -328,7 +328,7 @@ with import <nixpkgs> {};
       };
     };
   };
-  
+
   # services.foldingathome.enable = false;
 
   # https://www.tailscale.com/kb/1063/install-nixos
@@ -405,7 +405,7 @@ with import <nixpkgs> {};
   };
 
   # you have to add the user with smbpasswd -a [username]
-  # otherwise you won't be able to login with the user to 
+  # otherwise you won't be able to login with the user to
   # the samba share
   services.samba = {
     enable = true;
@@ -428,7 +428,7 @@ with import <nixpkgs> {};
         "create mask" = "0644";
         "force user" = "palesz";
         "force group" = "users";
-      };      
+      };
       data = {
 	      comment = "data folder";
         path = "/data";
@@ -454,6 +454,6 @@ with import <nixpkgs> {};
 #       ExecStart = "/bin/sh /data/projects/start-jupy.sh";
 #     };
 #   };
-  
+
 }
 
