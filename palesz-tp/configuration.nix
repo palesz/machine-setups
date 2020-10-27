@@ -76,7 +76,7 @@ with import <nixpkgs> {};
     wg0 = {
       ips = [ "10.100.0.1/24" ];
       listenPort = 58600;
-      privateKeyFile = "/etc/nixos/secrets/wireguard-keys/palesz-tp.private";
+      privateKeyFile = ./secrets/wireguard-keys/palesz-tp.private;
 
       peers = [
         {
@@ -343,7 +343,7 @@ with import <nixpkgs> {};
         "/etc/nixos"
       ];
       repository = "/syno/archive/restic_repo";
-      passwordFile = "/etc/nixos/secrets/restic-password";
+      passwordFile = ./secrets/restic-password;
       user = "root";
       extraBackupArgs = [
         "--exclude-if-present=.restic_skip"
@@ -390,16 +390,16 @@ with import <nixpkgs> {};
   };
 
   services.bitwarden.backups = {
-    palesz = { 
-      user = "root"; 
-      email = "palesz@gmail.com"; 
-      passwordFile = "/etc/nixos/secrets/bitwarden-palesz"; 
+    palesz = {
+      user = "root";
+      email = "palesz@gmail.com";
+      passwordFile = ./secrets/bitwarden-palesz;
       outputFile = "/syno/homes/palesz/bitwarden/export.json";
     };
-    monica = { 
-      user = "root"; 
-      email = "monica.ana@gmail.com"; 
-      passwordFile = "/etc/nixos/secrets/bitwarden-monica"; 
+    monica = {
+      user = "root";
+      email = "monica.ana@gmail.com";
+      passwordFile = ./secrets/bitwarden-monica;
       outputFile = "/syno/homes/monica/bitwarden/export.json";
     };
   };
