@@ -4,6 +4,10 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 
+;; enable use-package
+(setq use-package-always-ensure t)
+(require 'use-package)
+
 ;; fetch the list of packages available
 ; (unless package-archive-contents
 ;  (package-refresh-contents))
@@ -41,6 +45,9 @@
               tab-width 4
               c-basic-offset 4)
 
+;; do not add new line automatically
+(setq mode-require-final-newline nil)
+(setq require-final-newline nil)
 
 ;; Disable some GUI distractions.
 (tool-bar-mode -1)
@@ -50,6 +57,7 @@
 
 (line-number-mode)
 (column-number-mode)
+(show-paren-mode 1)
 
 ;; Stop creating backup and autosave files.
 (setq make-backup-files nil
@@ -66,6 +74,9 @@
 
 ;; Highlight the current line
 (global-hl-line-mode 1)
+
+;; show line numbers
+(global-display-line-numbers-mode 1)
 
 ;; Improved handling of clipboard in GNU/Linux and otherwise.
 (setq select-enable-clipboard t
@@ -123,7 +134,8 @@
     (calc . t)
     (ein . t)
     (js . t)
-    (http . t)))
+    (http . t)
+    (elasticsearch . t)))
 
 ;; org inline images
 (setq org-display-inline-images t)
@@ -149,4 +161,41 @@
 
 (require 'powerline)
 (powerline-default-theme)
+
+;; -------------------------------------------
+;; lsp-java setup
+;; -------------------------------------------
+;; https://github.com/emacs-lsp/lsp-java#quick-start
+
+(use-package projectile)
+(use-package flycheck)
+(use-package yasnippet :config (yas-global-mode))
+(use-package lsp-mode :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :config (setq lsp-completion-enable-additional-text-edit nil))
+(use-package hydra)
+(use-package company)
+(use-package lsp-ui)
+(use-package which-key :config (which-key-mode))
+(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+(use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
+(use-package dap-java :ensure nil)
+(use-package helm-lsp)
+(use-package helm
+  :config (helm-mode))
+(use-package lsp-treemacs)
+
+(setq lsp-java-vmargs (list "-noverify" "-Xmx8G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication")
+      lsp-file-watch-ignored '(".idea" ".git" "build"))
+
+;; activate helm, enable helm-M-x
+(helm-mode 1)
+(global-set-key (kbd "M-x") 'helm-M-x)
+
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+(require 'helm-projectile)
+(helm-projectile-on)
+
 

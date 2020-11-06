@@ -11,7 +11,7 @@
       <home-manager/nixos>
     ];
 
-  nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowUnfree = true;
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
@@ -92,8 +92,17 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  sound.enable = true;
+  # build packages with the expectation that pulse will be here
+  # nixpkgs.config.pulseaudio = true;
+  hardware.pulseaudio = {
+    enable = true;
+    package = pkgs.pulseaudioFull;
+    # fix the crackling
+    configFile = pkgs.runCommand "default.pa" {} ''
+      sed 's/module-udev-detect$/module-udev-detect tsched=0/' ${pkgs.pulseaudio}/etc/pulse/default.pa > $out
+    '';
+  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -117,6 +126,25 @@
       ];
   };
 
+  # databases used for development and SQL checks
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_11;
+    enableTCPIP = false; # localhost only via UNIX or localhost TCP
+    authentication = pkgs.lib.mkOverride 10 ''
+      local all all trust
+      host all all 127.0.0.1/32 trust
+      host all all ::1/128 trust
+    '';
+  };
+
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+    bind = "127.0.0.1"; # localhost only
+    port = 3306;
+  };
+
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.palesz = {
@@ -125,6 +153,7 @@
       "wheel"  # Enable ‘sudo’ for the user.
       "vboxsf" # Enable the access to the VirtualBox shared folders
       "docker" # Enable docker
+      "audio" # just in case
     ];
     shell = pkgs.fish;
   };
@@ -148,18 +177,21 @@
     };
 
     home.packages = with pkgs; [
-      brave
+      chromium
       bitwarden-cli
       lm_sensors
       tmux
       tree
-      htop
-      iotop
+      htop iotop iftop nethogs
+      inetutils
+      usbutils
+      pciutils
+      xorg.xdpyinfo
       sysstat
       nmap
       mc
       pandoc
-      inetutils
+      datamash
       graphviz
       nomacs
       slack
@@ -173,6 +205,8 @@
       zsh-powerlevel9k
       git
       git-lfs
+      clojure leiningen boot
+      sqlite sqlitebrowser sqliteInteractive
     ];
 
     programs.zsh = {
@@ -221,6 +255,7 @@ end
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [
+        use-package
         evil
         magit
         markdown-mode
@@ -228,6 +263,7 @@ end
         nix-mode
         cider
         adoc-mode
+        es-mode # https://github.com/dakrone/es-mode
         org-beautify-theme
         org-bullets
         htmlize
@@ -241,6 +277,21 @@ end
         json-mode
         ein
         visual-fill-column
+        projectile
+        helm
+        helm-lsp
+        helm-projectile
+        treemacs
+        flycheck
+        company
+        hydra
+        lsp-java
+        lsp-ui
+        lsp-mode
+        lsp-treemacs
+        dap-mode
+        yasnippet
+        which-key
       ];
     };
 

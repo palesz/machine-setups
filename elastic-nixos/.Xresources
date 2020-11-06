@@ -1,6 +1,11 @@
 !################
 ! Colors
 !################
+Xft.dpi: 120
+
+!################
+! Colors
+!################
 *foreground: white
 *background: black
 
