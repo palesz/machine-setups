@@ -1,3 +1,6 @@
+
+# automatically start the nix-shell in case we find
+# shell.nix anywhere in the parent directories during cwd()
 function start-nix-shell --on-variable PWD
   if test -z "$IN_NIX_SHELL"
     set d "$PWD"

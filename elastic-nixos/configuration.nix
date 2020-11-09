@@ -211,19 +211,6 @@
       sqlite sqlitebrowser sqliteInteractive
     ];
 
-    programs.zsh = {
-      enable = true;
-      enableAutosuggestions = true;
-      enableCompletion = true;
-      shellAliases = {
-        e = "(emacs >/dev/null 2>/dev/null &)";
-        n = "nix-shell";
-        # are we in a nix-shell?
-        "isn" = "env | grep NIX_SHELL";
-      };
-      initExtra = "source ${pkgs.zsh-powerlevel9k}/share/zsh-powerlevel9k/powerlevel9k.zsh-theme";
-    };
-
     programs.fish = {
       enable = true;
       shellAliases = {
