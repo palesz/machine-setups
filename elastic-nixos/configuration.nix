@@ -28,6 +28,7 @@
   # replicates the default behaviour.
   networking.useDHCP = false;
   networking.interfaces.enp0s3.useDHCP = true;
+  networking.enableIPv6 = false;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -71,6 +72,7 @@
 
   services.xrdp = {
     enable = true;
+    port = 3389;
     defaultWindowManager = "${pkgs.i3}/bin/i3";
   };
 
@@ -83,7 +85,7 @@
   services.openssh.forwardX11 = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 22 3389 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -92,11 +94,11 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  sound.enable = true;
+  sound.enable = false;
   # build packages with the expectation that pulse will be here
   # nixpkgs.config.pulseaudio = true;
   hardware.pulseaudio = {
-    enable = true;
+    enable = false;
     package = pkgs.pulseaudioFull;
     # fix the crackling
     configFile = pkgs.runCommand "default.pa" {} ''
@@ -225,31 +227,10 @@
     programs.fish = {
       enable = true;
       shellAliases = {
-        e = "fish -c 'emacs >/dev/null 2>/dev/null &'";
+        e = "emacs >/dev/null 2>/dev/null &; disown $pid";
+        i = "idea-community >/dev/null 2>/dev/null &; disown $pid";
       };
-      shellInit = ''
-function start-nix-shell --on-variable PWD
-  if test -z "$IN_NIX_SHELL"
-    set d "$PWD"
-    while test "$d" != "/"
-      if test -e "$d/shell.nix"
-        echo "Starting Nix shell defined in $d/shell.nix"
-        nix-shell "$d/shell.nix"
-        return
-      end
-      set d (dirname $d)
-    end
-  end
-end
-
-function isn
-  if test -z "$IN_NIX_SHELL"
-    echo "no"
-  else
-    echo "yes"
-  end
-end
-      '';
+      shellInit = builtins.readFile ../fish/shellInit.fish;
     };
     
     programs.emacs = {
@@ -292,6 +273,7 @@ end
         dap-mode
         yasnippet
         which-key
+        expand-region
       ];
     };
 

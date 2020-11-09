@@ -198,4 +198,8 @@
 (require 'helm-projectile)
 (helm-projectile-on)
 
+;; remove the Ctrl-Z binding, so emacs won't hang
+(global-unset-key (kbd "C-z"))
+
+(global-set-key (kbd "C-;") 'er/expand-region)
 
