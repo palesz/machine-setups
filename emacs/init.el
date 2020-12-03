@@ -15,6 +15,36 @@
 (require 'evil)
 (evil-mode 0)
 
+
+;; set different fonts for the variable and fixed pitch
+
+(set-face-attribute 'default nil :font "Monospace-16")
+
+(let* ((variable-tuple
+          (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo-18"))
+                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro-18"))
+                ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande-18"))
+                ((x-list-fonts "Verdana")         '(:font "Verdana-18"))
+                ((x-list-fonts "Helvetica")       '(:font "Helvetica-18" :weight thin))
+                ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+                (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+         (base-font-color     (face-foreground 'default nil 'default))
+         (headline           `(:inherit default :heihgt 1.0 :weight bold :foreground ,base-font-color :background "#deeeff")))
+
+    (custom-theme-set-faces
+     'user
+     `(variable-pitch ((t (:inherit default ,@variable-tuple))))
+     '(fixed-pitch ((t (:inherit default))))
+     `(org-level-8 ((t (,@headline ,@variable-tuple))))
+     `(org-level-7 ((t (,@headline ,@variable-tuple))))
+     `(org-level-6 ((t (,@headline ,@variable-tuple))))
+     `(org-level-5 ((t (,@headline ,@variable-tuple))))
+     `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+     `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+     `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+     `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
 (setq auto-save-timeout 5)
 
 ;; smooth scrolling
@@ -27,6 +57,13 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key [home] 'move-beginning-of-line)
+(global-set-key [end] 'move-end-of-line)
+
+;; org agenda files
+(setq org-agenda-files (append
+                        (directory-files "~/" t "\\.org$")
+                        (directory-files "~/projects/" t "\\.org$")))
 
 ;; horizontal and vertical split settings
 (setq split-height-threshold nil)
@@ -51,12 +88,20 @@
 
 ;; Disable some GUI distractions.
 (tool-bar-mode -1)
-(scroll-bar-mode -1)
 (menu-bar-mode -1)
 (blink-cursor-mode 0)
 
+;; I use the horizontal scrollbar in org mode, with big tables
+;; it is better than breaking the tables with visual-line-mode
+;; or having to zoom out
+(scroll-bar-mode 1)
+(horizontal-scroll-bar-mode 1)
+
+;; show the line and column numbers in the modeline
 (line-number-mode)
 (column-number-mode)
+
+;; highlight the parenthesis
 (show-paren-mode 1)
 
 ;; Stop creating backup and autosave files.
@@ -74,9 +119,12 @@
 
 ;; Highlight the current line
 (global-hl-line-mode 1)
+(set-face-background hl-line-face "#eeeeee" )
+
 
 ;; show line numbers
-(global-display-line-numbers-mode 1)
+;; found it distracting and it also messes up the org-mode indentation for files with 3-4 digits line numbers
+(global-display-line-numbers-mode -1)
 
 ;; Improved handling of clipboard in GNU/Linux and otherwise.
 (setq select-enable-clipboard t
@@ -101,8 +149,9 @@
 
 ;; (put 'narrow-to-region 'disabled nil)
 (setq fill-column 100)
-(global-visual-line-mode 1)
-(global-visual-fill-column-mode 1)
+
+(global-visual-line-mode -1)
+(global-visual-fill-column-mode -1)
 
 ;; org-babel setup
 (require 'ob-python)
@@ -137,6 +186,10 @@
     (http . t)
     (elasticsearch . t)))
 
+;; org-download for easy image insert
+(require 'org-download)
+(add-hook 'dired-mode-hook 'org-download-enable)
+
 ;; org inline images
 (setq org-display-inline-images t)
 (setq org-redisplay-inline-images t)
@@ -149,12 +202,40 @@
 ;; org-bullets
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(setq org-bullets-bullet-list '("⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞"))
+;; ∷
+;; (setq org-bullets-bullet-list '("➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤"))
+;; (setq org-bullets-bullet-list '("∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵"))
+;; (setq org-bullets-bullet-list '("⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼"))
+
+;; indentation
+(add-hook 'org-mode-hook (lambda () (org-indent-mode 1)))
+(setq org-indent-indentation-per-level 4)
+(setq org-adapt-indentation nil)
+(setq org-hide-leading-starts nil)
+
+;; enable variable pitch mode
+(add-hook 'org-mode-hook (lambda () (variable-pitch-mode 1)))
+
+;; emphasis markers
+(setq org-hide-emphasis-markers t)
+
+;; headline
+(setq org-fontify-whole-heading-line t
+      ;; I've included these to maximize compatibility with doom-themes in general
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+
+;; mix pitches
+(use-package mixed-pitch
+  :hook
+  (text-mode . mixed-pitch-mode)
+  (org-mode . mixed-pitch-mode))
 
 ;; Be able to change the image size
 ;; (setq org-image-actual-width 200)
 (setq org-image-actual-width '(1200))
 ;;(setq org-image-actual-width (/ (display-pixel-width) 3))
-
 
 ;; load-theme org-beautify
 (load-theme 'org-beautify t)
@@ -202,4 +283,14 @@
 (global-unset-key (kbd "C-z"))
 
 (global-set-key (kbd "C-;") 'er/expand-region)
+
+
+(require 'visual-regexp-steroids)
+(define-key global-map (kbd "C-c r") 'vr/replace)
+(define-key global-map (kbd "C-c q") 'vr/query-replace)
+;; if you use multiple-cursors, this is for you:
+(define-key global-map (kbd "C-c m") 'vr/mc-mark)
+;; to use visual-regexp-steroids's isearch instead of the built-in regexp isearch, also include the following lines:
+(define-key esc-map (kbd "C-r") 'vr/isearch-backward) ;; C-M-r
+(define-key esc-map (kbd "C-s") 'vr/isearch-forward) ;; C-M-s
 

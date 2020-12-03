@@ -13,51 +13,90 @@
   home.homeDirectory = "/Users/palesz";
 
   home.packages = with pkgs; [
-    htop
+    htop nethogs iotop
     tmux
     tree
-    # git - should use the Apple one
-    # adoptopenjdk-hotspot-bin-13
+    rsync
+    git
     maven3
     gradle
-    # jetbrains.idea-community
-    # docker
+    mc
+    colordiff
   ];
 
-    programs.emacs = {
-      enable = true;
-      extraPackages = epkgs: with epkgs; [
-        evil
-        magit
-        markdown-mode
-        beacon
-        nix-mode
-        cider
-        adoc-mode
-        org-beautify-theme
-        org-bullets
-        htmlize
-        powerline
-        ob-restclient
-        ob-clojurescript
-        ob-go
-        ob-http
-        ob-sql-mode
-        ob-async
-        json-mode
-        ein
-        visual-fill-column
-      ];
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      e = "emacs >/dev/null 2>/dev/null &; disown $pid";
     };
+    shellInit = builtins.readFile ../fish/shellInit.fish;
+  };
+  
+  programs.emacs = {
+    enable = true;
+    extraPackages = epkgs: with epkgs; [
+      use-package
+      evil
+      magit
+      markdown-mode
+      beacon
+      nix-mode
+      cider
+      adoc-mode
+      es-mode # https://github.com/dakrone/es-mode
+      org-beautify-theme
+      org-bullets
+      htmlize
+      powerline
+      ob-restclient
+      ob-clojurescript
+      ob-go
+      ob-http
+      ob-sql-mode
+      ob-async
+      json-mode
+      ein
+      visual-fill-column
+      projectile
+      helm
+      helm-lsp
+      helm-projectile
+      treemacs
+      flycheck
+      company
+      hydra
+      lsp-java
+      lsp-ui
+      lsp-mode
+      lsp-treemacs
+      dap-mode
+      yasnippet
+      which-key
+      visual-regexp
+      visual-regexp-steroids
+      org-download
+      mixed-pitch
+    ];
+  };
+  
+  programs.vim = {
+    enable = true;
+    plugins = with pkgs.vimPlugins; [ vim-airline ];
+    settings = {
+      background = "dark";
+      number = true;
+      relativenumber = true;
+    };
+  };
 
-    home.file.".emacs.d" = {
-      source = ../emacs;
-      recursive = true;
-    };
-
-    home.file.".zshrc" = {
-      source = ./.zshrc;
-    };
+  home.file.".emacs.d" = {
+    source = ../emacs;
+    recursive = true;
+  };
+  
+  home.file.".zshrc" = {
+    source = ./.zshrc;
+  };
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
