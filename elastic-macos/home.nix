@@ -29,11 +29,12 @@
   programs.fish = {
     enable = true;
     shellAliases = {
-      e = "emacs >/dev/null 2>/dev/null &; disown $pid";
+      emacs-daemon = "emacs -f server-start >/dev/null 2>/dev/null &; disown $pid";
+      e = "emacsclient";
     };
     shellInit = builtins.readFile ../fish/shellInit.fish;
   };
-  
+
   programs.emacs = {
     enable = true;
     extraPackages = epkgs: with epkgs; [
@@ -80,7 +81,7 @@
       mixed-pitch
     ];
   };
-  
+
   programs.vim = {
     enable = true;
     plugins = with pkgs.vimPlugins; [ vim-airline ];
@@ -95,7 +96,7 @@
     source = ../emacs;
     recursive = true;
   };
-  
+
   home.file.".zshrc" = {
     source = ./.zshrc;
   };
