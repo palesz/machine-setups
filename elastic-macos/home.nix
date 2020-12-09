@@ -24,6 +24,7 @@
     gradle
     mc
     colordiff
+    groovy
   ];
 
   programs.fish = {
@@ -79,6 +80,7 @@
       visual-regexp-steroids
       org-download
       mixed-pitch
+      atomic-chrome
     ];
   };
 

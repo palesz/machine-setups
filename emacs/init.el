@@ -168,6 +168,8 @@
 (require 'ob-ein)
 (require 'ob-js)
 (require 'ob-http)
+(require 'ob-java)
+(require 'ob-groovy)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -184,7 +186,9 @@
     (ein . t)
     (js . t)
     (http . t)
-    (elasticsearch . t)))
+    (elasticsearch . t)
+    (java . t)
+    (groovy . t)))
 
 ;; org-download for easy image insert
 (require 'org-download)
@@ -284,6 +288,14 @@
 
 (global-set-key (kbd "C-;") 'er/expand-region)
 
+;; Edit browser text with Emacs
+;; Install the
+;; Atomic Chrome: https://chrome.google.com/webstore/detail/atomic-chrome/lhaoghhllmiaaagaffababmkdllgfcmc
+;; or
+;; GhostText: https://github.com/GhostText/GhostText
+;; extensions into your browser to make it work.
+(require 'atomic-chrome)
+(atomic-chrome-start-server)
 
 (require 'visual-regexp-steroids)
 (define-key global-map (kbd "C-c r") 'vr/replace)
