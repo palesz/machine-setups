@@ -6,9 +6,6 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  # just to see if intellij will work with this
-  # nixpkgs.config.allowUnsupportedSystem = true;
-
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "palesz";
@@ -25,6 +22,10 @@
     mc
     colordiff
     groovy
+    restic
+    postgresql
+    mysql
+    clojure
   ];
 
   programs.fish = {
@@ -46,6 +47,7 @@
       beacon
       nix-mode
       cider
+      slime
       adoc-mode
       es-mode # https://github.com/dakrone/es-mode
       org-beautify-theme
@@ -101,6 +103,11 @@
 
   home.file.".zshrc" = {
     source = ./.zshrc;
+  };
+
+  home.file."bin" = {
+    source = ./bin;
+    recursive = true;
   };
 
   # This value determines the Home Manager release that your
