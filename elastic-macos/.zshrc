@@ -9,10 +9,11 @@ export PATH=$NIX_PROFILE/bin:$NIX_PROFILE/sbin:$NIX_PATH:$PATH:$HOME/bin
 export EDITOR=emacsclient
 
 export JAVA8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_281.jdk/Contents/Home
+export JAVA11_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
 export JAVA14_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
 export JAVA15_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
 export JAVA_HOME=$JAVA15_HOME
-export RUNTIME_JAVA_HOME=$JAVA8_HOME
+export RUNTIME_JAVA_HOME=$JAVA11_HOME
 
 # Use fish instead of zsh
 if [[ ! -o norcs ]]; then
