@@ -62,8 +62,7 @@
 
 ;; org agenda files
 (setq org-agenda-files (append
-                        (directory-files "~/" t "\\.org$")
-                        (directory-files "~/projects/" t "\\.org$")))
+                        (directory-files "~/orgs/" t "\\.org$")))
 
 ;; horizontal and vertical split settings
 (setq split-height-threshold nil)
@@ -190,6 +189,11 @@
     (java . t)
     (groovy . t)))
 
+;; org refile
+(setq org-refile-targets
+      '((nil :maxlevel . 3)
+        (org-agenda-files :maxlevel . 3)))
+
 ;; org-download for easy image insert
 (require 'org-download)
 (add-hook 'dired-mode-hook 'org-download-enable)
@@ -222,7 +226,7 @@
 (add-hook 'org-mode-hook (lambda () (variable-pitch-mode 1)))
 
 ;; emphasis markers
-(setq org-hide-emphasis-markers t)
+(setq org-hide-emphasis-markers nil)
 
 ;; headline
 (setq org-fontify-whole-heading-line t
