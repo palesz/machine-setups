@@ -10,6 +10,8 @@ export EDITOR=emacsclient
 
 export JAVA8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_281.jdk/Contents/Home
 export JAVA11_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
+export JAVA12_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-12.jdk/Contents/Home
+export JAVA13_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-13.jdk/Contents/Home
 export JAVA14_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
 export JAVA15_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
 export JAVA_HOME=$JAVA15_HOME
