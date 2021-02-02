@@ -26,6 +26,17 @@
     postgresql
     mysql
     clojure
+    (
+      let
+        my-python-packages = ps: with ps; [
+          matplotlib
+          requests
+          pip
+        ];
+        python-with-my-packages = pkgs.python38.withPackages my-python-packages;
+      in
+        python-with-my-packages
+    )
   ];
 
   programs.fish = {
