@@ -22,3 +22,6 @@ function isn
     echo "yes"
   end
 end
+
+# C-x C-e will open the $VISUAL or $EDITOR to edit the command line
+bind \cx\ce edit_command_buffer
