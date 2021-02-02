@@ -115,6 +115,7 @@
 
 ;; Nicer handling of regions
 (transient-mark-mode 1)
+(delete-selection-mode 1)
 
 ;; Highlight the current line
 (global-hl-line-mode 1)
