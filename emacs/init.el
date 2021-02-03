@@ -51,6 +51,17 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 2) ((control) . nil)))
 (setq mouse-wheel-progressive-speed nil)
 
+;; fixing page-up|down behaviour
+(global-set-key [next]
+  (lambda () (interactive)
+    (condition-case nil (scroll-up)
+      (end-of-buffer (goto-char (point-max))))))
+
+(global-set-key [prior]
+  (lambda () (interactive)
+    (condition-case nil (scroll-down)
+      (beginning-of-buffer (goto-char (point-min))))))
+
 (global-set-key (kbd "C-x e") 'evil-mode)
 (global-set-key (kbd "C-x G") 'magit-status)
 (global-set-key "\C-cl" 'org-store-link)
