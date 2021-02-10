@@ -22,15 +22,14 @@ with import <nixpkgs> {};
   # nixpkgs.config.android_sdk.accept_license = true;
 
   networking.hostName = "palesz-tp"; # Define your hostname.
-  # networking.networkmanager.enable = true;
+  networking.networkmanager.enable = false;
 
   # Since currently this machine is wired, let's disable the wireless access
   # no need for it
-  networking.wireless.enable = false;  # Enables wireless support via wpa_supplicant.
-  networking.wireless.networks= {
+  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.wireless.networks = {
     palesz = {
-      # Use `wpa_passphrase YOUR_SSID YOUR_PASSWORD` to generate the password here
-      psk = "<<password here>>";
+      psk = builtins.replaceStrings ["\n"] [""] "${builtins.readFile ./secrets/wpa-palesz-psk}";
     };
   };
 
