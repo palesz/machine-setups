@@ -54,6 +54,8 @@ with import <nixpkgs> {};
       3389 # xrdp
       58080 # http server
       58443 # https server
+      5601 # kibana
+      8080 # miniflux
       # 58090 58091 58092 # video broadcast
     ];
     allowedUDPPorts = [
@@ -123,7 +125,7 @@ with import <nixpkgs> {};
   security.acme.email = "palesz@gmail.com";
 
   services.nginx = {
-    enable = true;
+    enable = false;
     virtualHosts."palesz.synology.me" = {
       enableACME = true;
       forceSSL = true;
@@ -139,6 +141,14 @@ with import <nixpkgs> {};
           index = "index.html";
         };
       };
+    };
+  };
+
+  services.miniflux = {
+    enable = true;
+    config = {
+      LISTEN_ADDR = "192.168.2.45:8080";
+      BASE_URL = "http://192.168.2.45:8080/";
     };
   };
 
@@ -219,14 +229,12 @@ with import <nixpkgs> {};
       lm_sensors
       tmux
       tree
-      htop
-      iotop
+      htop iotop iftop nethogs ethtool
       sysstat
       youtube-dl
       nmap
       mc
       gimp
-      # conda
       irssi
       exiftool
       pandoc
@@ -245,30 +253,28 @@ with import <nixpkgs> {};
       qpdfview
       hexchat
       libreoffice
+      datamash gnumeric
       # python with a custom package list
       (
         let
           my-python-packages = ps: with ps; [
-            pandas
-            matplotlib
+            pandas # needs libstdc++, so cannot install with pip
             requests
-            geopandas
-            cartopy
-            seaborn
             pip
+            setuptools
+            wheel
           ];
-          python-with-my-packages = pkgs.python38.withPackages my-python-packages;
+          python-with-my-packages = pkgs.python37.withPackages my-python-packages;
         in
           python-with-my-packages
       )
-      pipenv
       unzip
+      wine
     ];
 
     programs.feh.enable = true;
 
     programs.fish.enable = true;
-    programs.zsh.enable = true;
 
     programs.emacs = {
       enable = true;
@@ -324,6 +330,14 @@ with import <nixpkgs> {};
         credential.helper = "store";
       };
     };
+  };
+
+  services.elasticsearch = {
+    enable = true;
+  };
+  services.kibana = {
+    enable = true;
+    listenAddress = "0.0.0.0";
   };
 
   # services.foldingathome.enable = false;
@@ -401,6 +415,10 @@ with import <nixpkgs> {};
     };
   };
 
+  services.printing = {
+    enable = true;
+  };
+
   # you have to add the user with smbpasswd -a [username]
   # otherwise you won't be able to login with the user to
   # the samba share
@@ -438,19 +456,6 @@ with import <nixpkgs> {};
       };
     };
   };
-
-#   systemd.services.jupyterNotebookSvc = {
-#     description = "JupyterLab as service";
-#     wantedBy = [ "multi-user.target" ];
-#     after = [ "network.target" ];
-#     serviceConfig = {
-#       Restart = "always";
-#       RestartSec = "120min";
-#       TimeoutStartSec = "15min";
-#       User = "palesz";
-#       ExecStart = "/bin/sh /data/projects/start-jupy.sh";
-#     };
-#   };
 
 }
 
