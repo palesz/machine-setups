@@ -86,44 +86,39 @@ let
       chmod +x $out/bin/bash
     '';
   bashRcHiPrio = lib.hiPrio bashRcPkg;
-in
-with pkgs; (buildFHSUserEnv {
-  name = "es-dev-fhs-shell";
-  targetPkgs = pkgs: with pkgs; [
-    coreutils
-    bashInteractive
-    bashRcHiPrio
-    jetbrains.idea-community
-    openssl
-    zlib
-    gcc
-    glibc
-    ncurses
-  ];
-  multiPkgs = pkgs: with pkgs; [  ];
-  /*
-  runScript = "bash";
-  profile = ''
-    export JAVA11_HOME='/home/palesz/.java/jdk-11.0.8+10'
-    export JAVA14_HOME='/home/palesz/.java/jdk-14.0.2+12'
-    export JAVA_HOME=$JAVA14_HOME
+  fhs = pkgs.buildFHSUserEnv {
+    name = "es-dev-env";
+    targetPkgs = pkgs: with pkgs; [
+      coreutils
+      bashInteractive
+      bashRcHiPrio
+      jetbrains.idea-community
+      openssl
+      zlib
+      gcc
+      glibc
+      ncurses
+    ];
+    multiPkgs = pkgs: with pkgs; [  ];
+    runScript = writeScript "runScript" ''
+          #! ${stdenv.shell}
 
-    # make sure that the `java` I want is used by default and it is on the path
-    # echo "Path before change: $PATH"
-    export PATH="$JAVA_HOME/bin:$PATH"
-  '';*/
-  runScript = writeScript "runScript" ''
-    #! ${stdenv.shell}
+          source /etc/profile
 
-    source /etc/profile
-
-    ${pkgs.fish}/bin/fish --init-command='source "${customFishShellInit}"'
-  '';
-}).env
+          ${pkgs.fish}/bin/fish --init-command='source "${customFishShellInit}"'
+        '';
+  };
+in pkgs.stdenv.mkDerivation {
+  name = "es-dev-env-shell";
+  nativeBuildInputs = [ fhs ];
+  shellHook = "exec es-dev-env";
+}
 
 /*
 learnings:
 - the Gradle Daemon survives between nix-shell sessions. Make sure that you kill the gradle daemon (ps -ef | grep gradle) in case you changed the path or the configuration
 - for me idea was running a previous version of the shell, and it kept starting up a daemon with the previous path in the background that the new shell utilized. This caused a bunch of headscratches.
+
+Potential zlib fix: https://discourse.nixos.org/t/problem-with-gradle-building-kotlin-native/7272/2
 */
 

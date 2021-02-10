@@ -10,6 +10,9 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+  /*boot.extraModprobeConfig = ''
+    options snd slots=snd-hda-intel
+  '';*/
 
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/22dce0d0-567e-47cc-816c-28268223826e";

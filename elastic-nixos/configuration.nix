@@ -11,7 +11,7 @@
       <home-manager/nixos>
     ];
 
-  nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowUnfree = true;
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
@@ -28,6 +28,7 @@
   # replicates the default behaviour.
   networking.useDHCP = false;
   networking.interfaces.enp0s3.useDHCP = true;
+  networking.enableIPv6 = false;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -71,6 +72,7 @@
 
   services.xrdp = {
     enable = true;
+    port = 3389;
     defaultWindowManager = "${pkgs.i3}/bin/i3";
   };
 
@@ -83,7 +85,7 @@
   services.openssh.forwardX11 = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 22 3389 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
@@ -92,8 +94,17 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  sound.enable = false;
+  # build packages with the expectation that pulse will be here
+  # nixpkgs.config.pulseaudio = true;
+  hardware.pulseaudio = {
+    enable = false;
+    package = pkgs.pulseaudioFull;
+    # fix the crackling
+    configFile = pkgs.runCommand "default.pa" {} ''
+      sed 's/module-udev-detect$/module-udev-detect tsched=0/' ${pkgs.pulseaudio}/etc/pulse/default.pa > $out
+    '';
+  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -117,6 +128,25 @@
       ];
   };
 
+  # databases used for development and SQL checks
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_11;
+    enableTCPIP = false; # localhost only via UNIX or localhost TCP
+    authentication = pkgs.lib.mkOverride 10 ''
+      local all all trust
+      host all all 127.0.0.1/32 trust
+      host all all ::1/128 trust
+    '';
+  };
+
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+    bind = "127.0.0.1"; # localhost only
+    port = 3306;
+  };
+
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.palesz = {
@@ -125,6 +155,7 @@
       "wheel"  # Enable ‘sudo’ for the user.
       "vboxsf" # Enable the access to the VirtualBox shared folders
       "docker" # Enable docker
+      "audio" # just in case
     ];
     shell = pkgs.fish;
   };
@@ -148,18 +179,21 @@
     };
 
     home.packages = with pkgs; [
-      brave
+      chromium
       bitwarden-cli
       lm_sensors
       tmux
       tree
-      htop
-      iotop
+      htop iotop iftop nethogs
+      inetutils
+      usbutils
+      pciutils
+      xorg.xdpyinfo
       sysstat
       nmap
       mc
       pandoc
-      inetutils
+      datamash
       graphviz
       nomacs
       slack
@@ -173,54 +207,23 @@
       zsh-powerlevel9k
       git
       git-lfs
+      clojure leiningen boot
+      sqlite sqlitebrowser sqliteInteractive
     ];
-
-    programs.zsh = {
-      enable = true;
-      enableAutosuggestions = true;
-      enableCompletion = true;
-      shellAliases = {
-        e = "(emacs >/dev/null 2>/dev/null &)";
-        n = "nix-shell";
-        # are we in a nix-shell?
-        "isn" = "env | grep NIX_SHELL";
-      };
-      initExtra = "source ${pkgs.zsh-powerlevel9k}/share/zsh-powerlevel9k/powerlevel9k.zsh-theme";
-    };
 
     programs.fish = {
       enable = true;
       shellAliases = {
-        e = "fish -c 'emacs >/dev/null 2>/dev/null &'";
+        e = "emacs >/dev/null 2>/dev/null &; disown $pid";
+        i = "idea-community >/dev/null 2>/dev/null &; disown $pid";
       };
-      shellInit = ''
-function start-nix-shell --on-variable PWD
-  if test -z "$IN_NIX_SHELL"
-    set d "$PWD"
-    while test "$d" != "/"
-      if test -e "$d/shell.nix"
-        echo "Starting Nix shell defined in $d/shell.nix"
-        nix-shell "$d/shell.nix"
-        return
-      end
-      set d (dirname $d)
-    end
-  end
-end
-
-function isn
-  if test -z "$IN_NIX_SHELL"
-    echo "no"
-  else
-    echo "yes"
-  end
-end
-      '';
+      shellInit = builtins.readFile ../fish/shellInit.fish;
     };
     
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [
+        use-package
         evil
         magit
         markdown-mode
@@ -228,6 +231,7 @@ end
         nix-mode
         cider
         adoc-mode
+        es-mode # https://github.com/dakrone/es-mode
         org-beautify-theme
         org-bullets
         htmlize
@@ -241,11 +245,27 @@ end
         json-mode
         ein
         visual-fill-column
+        projectile
+        helm
+        helm-lsp
+        helm-projectile
+        treemacs
+        flycheck
+        company
+        hydra
+        lsp-java
+        lsp-ui
+        lsp-mode
+        lsp-treemacs
+        dap-mode
+        yasnippet
+        which-key
+        expand-region
       ];
     };
 
     home.file.".emacs.d" = {
-      source = ./emacs;
+      source = ../emacs;
       recursive = true;
     };
 
