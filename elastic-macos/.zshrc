@@ -15,7 +15,7 @@ export JAVA13_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-13.jdk/Content
 export JAVA14_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
 export JAVA15_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
 export JAVA_HOME=$JAVA15_HOME
-export RUNTIME_JAVA_HOME=$JAVA11_HOME
+export RUNTIME_JAVA_HOME=$JAVA15_HOME
 
 # Use fish instead of zsh
 if [[ ! -o norcs ]]; then
