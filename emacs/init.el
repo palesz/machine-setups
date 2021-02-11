@@ -296,6 +296,9 @@
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
+;; enable git-gutter by default
+(git-gutter-mode)
+
 (require 'helm-projectile)
 (helm-projectile-on)
 

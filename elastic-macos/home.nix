@@ -94,6 +94,7 @@
       org-download
       mixed-pitch
       atomic-chrome
+      git-gutter
     ];
   };
 
