@@ -13,7 +13,7 @@
 
   home.packages = with pkgs; [
     htop nethogs iotop
-    tmux
+    tmux tmuxPlugins.resurrect
     tree
     rsync
     git
@@ -106,6 +106,24 @@
       number = true;
       relativenumber = true;
     };
+  };
+
+  programs.tmux = {
+    enable = true;
+    plugins = with pkgs; [
+      tmuxPlugins.cpu
+      {
+        plugin = tmuxPlugins.resurrect;
+        extraConfig = "set -g @resurrect-strategy-nvim 'session'";
+      }
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '5' # minutes
+        '';
+      }
+    ];
   };
 
   home.file.".emacs.d" = {
