@@ -23,6 +23,7 @@
     colordiff
     groovy
     restic
+    # relational databases (for the cli)
     postgresql
     mysql
     clojure
@@ -37,6 +38,8 @@
       in
         python-with-my-packages
     )
+    # load bash env setup into fish easily with `fenv`
+    fishPlugins.foreign-env
   ];
 
   programs.fish = {
@@ -45,7 +48,22 @@
       emacs-daemon = "emacs -f server-start >/dev/null 2>/dev/null &; disown $pid";
       e = "emacsclient";
     };
-    shellInit = builtins.readFile ../fish/shellInit.fish;
+    shellInit = ''
+      ${builtins.readFile ../fish/shellInit.fish}
+
+      set NIX_LINK $HOME/.nix-profile
+
+      set EDITOR emacsclient
+      set JAVA8_HOME /Library/Java/JavaVirtualMachines/jdk1.8.0_281.jdk/Contents/Home
+      set JAVA11_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
+      set JAVA12_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-12.jdk/Contents/Home
+      set JAVA13_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-13.jdk/Contents/Home
+      set JAVA14_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
+      set JAVA15_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
+      set JAVA_HOME $JAVA15_HOME
+      set RUNTIME_JAVA_HOME $JAVA15_HOME
+
+    '';
   };
 
   programs.emacs = {
@@ -60,7 +78,8 @@
       cider
       slime
       adoc-mode
-      es-mode # https://github.com/dakrone/es-mode
+      # https://github.com/dakrone/es-mode
+      es-mode
       org-beautify-theme
       org-bullets
       htmlize
