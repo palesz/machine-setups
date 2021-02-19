@@ -286,7 +286,8 @@
 (use-package lsp-treemacs)
 
 (setq lsp-java-vmargs (list "-noverify" "-Xmx8G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication")
-      lsp-file-watch-ignored '(".idea" ".git" "build"))
+      lsp-file-watch-ignored '(".idea" ".git" "build")
+      lsp-file-watch-threshold 1000)
 
 ;; activate helm, enable helm-M-x
 (helm-mode 1)
