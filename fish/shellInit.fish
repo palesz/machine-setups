@@ -23,5 +23,10 @@ function isn
   end
 end
 
+# Serve the current directory on the HTTP port 8000 automatically
+function serve
+  python -m http.server 8000
+end
+
 # C-x C-e will open the $VISUAL or $EDITOR to edit the command line
 bind \cx\ce edit_command_buffer
