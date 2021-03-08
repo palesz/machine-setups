@@ -22,6 +22,7 @@
     mc
     colordiff
     groovy
+    jq
     restic
     # relational databases (for the cli)
     postgresql
@@ -32,7 +33,9 @@
         my-python-packages = ps: with ps; [
           matplotlib
           requests
+          setuptools
           pip
+          virtualenv
         ];
         python-with-my-packages = pkgs.python38.withPackages my-python-packages;
       in
@@ -78,6 +81,7 @@
       cider
       slime
       adoc-mode
+      yaml-mode
       # https://github.com/dakrone/es-mode
       es-mode
       org-beautify-theme
