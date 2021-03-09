@@ -15,6 +15,8 @@
     htop nethogs iotop
     tmux tmuxPlugins.resurrect
     tree
+    watch
+    fswatch
     rsync
     git
     maven3
@@ -43,6 +45,7 @@
     )
     # load bash env setup into fish easily with `fenv`
     fishPlugins.foreign-env
+    google-cloud-sdk
   ];
 
   programs.fish = {
@@ -54,17 +57,25 @@
     shellInit = ''
       ${builtins.readFile ../fish/shellInit.fish}
 
-      set NIX_LINK $HOME/.nix-profile
-
-      set EDITOR emacsclient
-      set JAVA8_HOME /Library/Java/JavaVirtualMachines/jdk1.8.0_281.jdk/Contents/Home
-      set JAVA11_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
-      set JAVA12_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-12.jdk/Contents/Home
-      set JAVA13_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-13.jdk/Contents/Home
-      set JAVA14_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
-      set JAVA15_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
-      set JAVA_HOME $JAVA15_HOME
-      set RUNTIME_JAVA_HOME $JAVA15_HOME
+      set -x NIX_LINK $HOME/.nix-profile
+      set -x EDITOR emacsclient
+      set -x JAVA8_HOME /Library/Java/JavaVirtualMachines/jdk1.8.0_281.jdk/Contents/Home
+      set -x JAVA11_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
+      set -x JAVA12_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-12.jdk/Contents/Home
+      set -x JAVA13_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-13.jdk/Contents/Home
+      set -x JAVA14_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-14.jdk/Contents/Home
+      set -x JAVA15_HOME /Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
+      set -x JAVA_HOME $JAVA15_HOME
+      set -x RUNTIME_JAVA_HOME $JAVA15_HOME
+      set -x VAULT_ADDR "https://secrets.elastic.co:8200"
+      set -x GOOGLE_AUTH_TOKEN (gcloud auth print-access-token)
+      # set -x PIP_DIR $HOME/.pip
+      # set -x PYTHONPATH "$PYTHONPATH":$PIP_DIR/lib/python3.8/site-packages
+      set -x PATH "$PATH":$PIP_DIR/bin
+      set -x AWS_PROFILE elastic-dev
+      set -x LDFLAGS "-L/usr/local/opt/zlib/lib"
+      set -x CPPFLAGS "-I/usr/local/opt/zlib/include"
+      set -x PKG_CONFIG_PATH "/usr/local/opt/zlib/lib/pkgconfig"
 
     '';
   };
@@ -82,7 +93,6 @@
       slime
       adoc-mode
       yaml-mode
-      # https://github.com/dakrone/es-mode
       es-mode
       org-beautify-theme
       org-bullets
