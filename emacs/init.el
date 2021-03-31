@@ -20,6 +20,8 @@
 
 (set-face-attribute 'default nil :font "Monospace-16")
 
+(require 'color)
+
 (let* ((variable-tuple
           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo-18"))
                 ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro-18"))
@@ -28,12 +30,13 @@
                 ((x-list-fonts "Helvetica")       '(:font "Helvetica-18" :weight thin))
                 ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
                 (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+          ;;'())
          (base-font-color     (face-foreground 'default nil 'default))
-         (headline           `(:inherit default :heihgt 1.0 :weight bold :foreground ,base-font-color :background "#deeeff")))
+         (headline           `(:inherit default :heihgt 1.0 :weight bold :foreground ,base-font-color :background "#ffffff")))
 
     (custom-theme-set-faces
      'user
-     `(variable-pitch ((t (:inherit default ,@variable-tuple))))
+     ;;`(variable-pitch ((t (:inherit default ,@variable-tuple))))
      '(fixed-pitch ((t (:inherit default))))
      `(org-level-8 ((t (,@headline ,@variable-tuple))))
      `(org-level-7 ((t (,@headline ,@variable-tuple))))
@@ -43,7 +46,12 @@
      `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
      `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
      `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))
+     `(org-block-begin-line ((t (:foreground "#909090" :background "#ececec" :height 0.75))))
+     `(org-block ((t (:background "#fafafa"))))
+     `(org-block-end-line ((t (:foreground "#909090" :background "#ececec" :height 0.75))))))
+
+(setq org-src-fontify-natively t)
 
 (setq auto-save-timeout 5)
 
@@ -114,9 +122,12 @@
 ;; highlight the parenthesis
 (show-paren-mode 1)
 
-;; Stop creating backup and autosave files.
-(setq make-backup-files nil
-      auto-save-default nil)
+;; Stop creating backup files
+(setq make-backup-files nil)
+
+;; autosave files - https://emacs.stackexchange.com/questions/7729/autosave-scratch-to-a-directory
+(setq-local default-directory "~/orgs/.autosave")
+(setq-default auto-save-default t)
 
 ;; Accept 'y' and 'n' rather than 'yes' and 'no'.
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -178,7 +189,7 @@ This command does not push text to `kill-ring'."
 
 ;; Highlight the current line
 (global-hl-line-mode 1)
-(set-face-background hl-line-face "#eeeeee" )
+(set-face-background hl-line-face "#fdfeca" )
 
 
 ;; show line numbers
@@ -200,7 +211,7 @@ This command does not push text to `kill-ring'."
       scroll-conservatively 5)
 
 ;; Trailing white space are banned!
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace nil)
 
 ;; Shouldn't highlight trailing spaces in terminal mode.
 (add-hook 'term-mode (lambda () (setq show-trailing-whitespace nil)))
@@ -270,15 +281,17 @@ This command does not push text to `kill-ring'."
 ;; org-bullets
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-(setq org-bullets-bullet-list '("⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞"))
+(setq org-bullets-bullet-list '(" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "))
+;; (setq org-bullets-bullet-list '("|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|"))
+;; (setq org-bullets-bullet-list '("⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞"))
 ;; ∷
 ;; (setq org-bullets-bullet-list '("➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤"))
 ;; (setq org-bullets-bullet-list '("∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵"))
 ;; (setq org-bullets-bullet-list '("⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼"))
 
 ;; indentation
-(add-hook 'org-mode-hook (lambda () (org-indent-mode 1)))
-(setq org-indent-indentation-per-level 4)
+(add-hook 'org-mode-hook (lambda () (org-indent-mode 0)))
+(setq org-indent-indentation-per-level 0)
 (setq org-adapt-indentation nil)
 (setq org-hide-leading-starts nil)
 
