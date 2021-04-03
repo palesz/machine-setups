@@ -53,14 +53,17 @@ with import <nixpkgs> {};
       445 139 # samba
       3389 # xrdp
       58080 # http server
+      18080 # http server
       58443 # https server
       5601 # kibana
       8080 # miniflux
-      # 58090 58091 58092 # video broadcast
+      22000 # syncthing tcp
     ];
     allowedUDPPorts = [
       # 58600 # wireguard
       137 138 # samba
+      22000 # syncthing quic
+      21027 # syncthing discovery port
     ];
 
     /*
@@ -125,15 +128,15 @@ with import <nixpkgs> {};
   security.acme.email = "palesz@gmail.com";
 
   services.nginx = {
-    enable = false;
+    enable = true;
     virtualHosts."palesz.synology.me" = {
-      enableACME = true;
-      forceSSL = true;
+      enableACME = false;
+      forceSSL = false;
       default = true;
       serverAliases = [ "palesz.synology.me" ];
       listen = [
         { addr = "0.0.0.0"; port = 58080; }
-        { addr = "0.0.0.0"; port = 58443; ssl = true; }
+        # { addr = "0.0.0.0"; port = 58443; ssl = true; }
       ];
       root = "/data/www/";
       locations = {
@@ -144,12 +147,38 @@ with import <nixpkgs> {};
     };
   };
 
+  services.zoneminder = {
+    enable = false;
+    openFirewall = false;
+    database = {
+      createLocally = true;
+      username = "zoneminder";
+    };
+    cameras = 2;
+    storageDir = "/data/var/lib/zoneminder";
+  };
+
+  services.nextcloud = {
+    enable = false; # not yet
+    package = pkgs.nextcloud20;
+    hostName = "192.168.2.45";
+    config = {
+      dbtype = "sqlite";
+      dbpass = toString ./secrets/nextcloud/dbpass;
+      adminpass = toString ./secrets/nextcloud/adminpass;
+    };
+  };
+
   services.miniflux = {
     enable = true;
     config = {
-      LISTEN_ADDR = "192.168.2.45:8080";
-      BASE_URL = "http://192.168.2.45:8080/";
+      LISTEN_ADDR = "0.0.0.0:8080";
+      BASE_URL = "http:///";
     };
+  };
+
+  services.rss-bridge = {
+    enable = true;
   };
 
   # Enable CUPS to print documents.
@@ -222,14 +251,18 @@ with import <nixpkgs> {};
       "adobe-reader-9.5.5-1"
     ];
 
+    services.syncthing.enable = true;
+
     home.packages = with pkgs; [
       adobe-reader
+      pdftk
       brave
       bitwarden-cli
       lm_sensors
       tmux
       tree
-      htop iotop iftop nethogs ethtool
+      htop iotop iftop nethogs ethtool iperf3
+      gotty
       sysstat
       youtube-dl
       nmap
@@ -250,7 +283,7 @@ with import <nixpkgs> {};
       # android-studio
       # adb-sync
       qbittorrent
-      qpdfview
+      qpdf qpdfview
       hexchat
       libreoffice
       datamash gnumeric
@@ -268,9 +301,11 @@ with import <nixpkgs> {};
         in
           python-with-my-packages
       )
-      unzip
+      zip unzip
       wine
     ];
+
+    programs.go.enable = true;
 
     programs.feh.enable = true;
 
@@ -279,13 +314,16 @@ with import <nixpkgs> {};
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [
+        use-package
         evil
         magit
         markdown-mode
         beacon
         nix-mode
         cider
+        slime
         adoc-mode
+        es-mode # https://github.com/dakrone/es-mode
         org-beautify-theme
         org-bullets
         htmlize
@@ -299,12 +337,32 @@ with import <nixpkgs> {};
         json-mode
         ein
         visual-fill-column
-      ];
+        projectile
+        helm
+        helm-lsp
+        helm-projectile
+        treemacs
+        flycheck
+        company
+        hydra
+        lsp-java
+        lsp-ui
+        lsp-mode
+        lsp-treemacs
+        dap-mode
+        yasnippet
+        which-key
+        visual-regexp
+        visual-regexp-steroids
+        org-download
+        mixed-pitch
+        atomic-chrome
+          ];
     };
 
     home.file.".emacs.d" = {
       # example configuration: https://gitlab.com/rycee/configurations/blob/d6dcf6480e29588fd473bd5906cd226b49944019/user/emacs.nix
-      source = ./emacs;
+      source = ../emacs;
       recursive = true;
     };
 
@@ -352,6 +410,7 @@ with import <nixpkgs> {};
         "/home/palesz"
         "/data"
         "/etc/nixos"
+        "/var/lib"
       ];
       repository = "/syno/archive/restic_repo";
       passwordFile = toString ./secrets/restic-password;

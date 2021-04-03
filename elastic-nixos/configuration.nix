@@ -185,6 +185,7 @@
       tmux
       tree
       htop iotop iftop nethogs
+      gotty
       inetutils
       usbutils
       pciutils
@@ -219,7 +220,7 @@
       };
       shellInit = builtins.readFile ../fish/shellInit.fish;
     };
-    
+
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [

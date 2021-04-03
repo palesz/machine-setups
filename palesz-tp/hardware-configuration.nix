@@ -65,7 +65,13 @@
       options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
   };
 
-  swapDevices =
+  fileSystems."/syno/surveillance" = {
+      device = "//192.168.2.28/surveillance";
+      fsType = "cifs";
+      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
+  };
+
+ swapDevices =
     [ { device = "/dev/disk/by-uuid/ecf24fbf-7da7-41ea-9a3d-0d7207011e3e"; }
     ];
 
