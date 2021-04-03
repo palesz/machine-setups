@@ -147,17 +147,6 @@ with import <nixpkgs> {};
     };
   };
 
-  services.zoneminder = {
-    enable = false;
-    openFirewall = false;
-    database = {
-      createLocally = true;
-      username = "zoneminder";
-    };
-    cameras = 2;
-    storageDir = "/data/var/lib/zoneminder";
-  };
-
   services.nextcloud = {
     enable = false; # not yet
     package = pkgs.nextcloud20;
@@ -232,14 +221,6 @@ with import <nixpkgs> {};
   home-manager.users.palesz = {pkgs, ...}: {
 
     nixpkgs.config.allowUnfree = true;
-
-    # emacs bleeding edge overlay
-    # https://github.com/nix-community/emacs-overlay
-    # nixpkgs.overlays = [
-    #  (import (builtins.fetchTarball {
-    #    url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz;
-    #  }))
-    # ];
 
     nixpkgs.config.packageOverrides = pkgs: {
       emacs = pkgs.emacs.override {
@@ -357,7 +338,8 @@ with import <nixpkgs> {};
         org-download
         mixed-pitch
         atomic-chrome
-          ];
+        git-gutter
+      ];
     };
 
     home.file.".emacs.d" = {
@@ -388,14 +370,24 @@ with import <nixpkgs> {};
         credential.helper = "store";
       };
     };
-  };
 
-  services.elasticsearch = {
-    enable = true;
-  };
-  services.kibana = {
-    enable = true;
-    listenAddress = "0.0.0.0";
+    programs.tmux = {
+      enable = true;
+      plugins = with pkgs; [
+        tmuxPlugins.cpu
+        {
+          plugin = tmuxPlugins.resurrect;
+          extraConfig = "set -g @resurrect-strategy-nvim 'session'";
+        }
+        {
+          plugin = tmuxPlugins.continuum;
+          extraConfig = ''
+            set -g @continuum-restore 'on'
+            set -g @continuum-save-interval '5' # minutes
+          '';
+        }
+      ];
+    };
   };
 
   # services.foldingathome.enable = false;
