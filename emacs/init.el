@@ -20,6 +20,8 @@
 
 (set-face-attribute 'default nil :font "Monospace-16")
 
+(require 'color)
+
 (let* ((variable-tuple
           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo-18"))
                 ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro-18"))
@@ -28,12 +30,13 @@
                 ((x-list-fonts "Helvetica")       '(:font "Helvetica-18" :weight thin))
                 ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
                 (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+          ;;'())
          (base-font-color     (face-foreground 'default nil 'default))
-         (headline           `(:inherit default :heihgt 1.0 :weight bold :foreground ,base-font-color :background "#deeeff")))
+         (headline           `(:inherit default :heihgt 1.0 :weight bold :foreground ,base-font-color :background "#ffffff")))
 
     (custom-theme-set-faces
      'user
-     `(variable-pitch ((t (:inherit default ,@variable-tuple))))
+     ;;`(variable-pitch ((t (:inherit default ,@variable-tuple))))
      '(fixed-pitch ((t (:inherit default))))
      `(org-level-8 ((t (,@headline ,@variable-tuple))))
      `(org-level-7 ((t (,@headline ,@variable-tuple))))
@@ -43,7 +46,12 @@
      `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
      `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
      `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+     `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))
+     `(org-block-begin-line ((t (:foreground "#909090" :background "#ececec" :height 0.75))))
+     `(org-block ((t (:background "#fafafa"))))
+     `(org-block-end-line ((t (:foreground "#909090" :background "#ececec" :height 0.75))))))
+
+(setq org-src-fontify-natively t)
 
 (setq auto-save-timeout 5)
 
@@ -114,9 +122,12 @@
 ;; highlight the parenthesis
 (show-paren-mode 1)
 
-;; Stop creating backup and autosave files.
-(setq make-backup-files nil
-      auto-save-default nil)
+;; Stop creating backup files
+(setq make-backup-files nil)
+
+;; autosave files - https://emacs.stackexchange.com/questions/7729/autosave-scratch-to-a-directory
+(setq-local default-directory "~/orgs/.autosave")
+(setq-default auto-save-default t)
 
 ;; Accept 'y' and 'n' rather than 'yes' and 'no'.
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -128,9 +139,57 @@
 (transient-mark-mode 1)
 (delete-selection-mode 1)
 
+;; don't copy after mouse selection
+(setq mouse-drag-copy-region nil)
+(setq select-active-regions nil)
+
+;; Don't add to the kill-ring on delete
+(defun my-delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-region
+   (point)
+   (progn
+     (forward-word arg)
+     (point))))
+
+(defun my-backward-delete-word (arg)
+  "Delete characters backward until encountering the beginning of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (my-delete-word (- arg)))
+
+(defun my-delete-line ()
+  "Delete text from current position to end of line char.
+This command does not push text to `kill-ring'."
+  (interactive)
+  (delete-region
+   (point)
+   (progn (end-of-line 1) (point)))
+  (delete-char 1))
+
+(defun my-delete-line-backward ()
+  "Delete text between the beginning of the line to the cursor position.
+This command does not push text to `kill-ring'."
+  (interactive)
+  (let (p1 p2)
+    (setq p1 (point))
+    (beginning-of-line 1)
+    (setq p2 (point))
+    (delete-region p1 p2)))
+
+; bind them to emacs's default shortcut keys:
+(global-set-key (kbd "C-S-k") 'my-delete-line-backward) ; Ctrl+Shift+k
+(global-set-key (kbd "C-k") 'my-delete-line)
+(global-set-key (kbd "M-d") 'my-delete-word)
+(global-set-key (kbd "<M-backspace>") 'my-backward-delete-word)
+
 ;; Highlight the current line
 (global-hl-line-mode 1)
-(set-face-background hl-line-face "#eeeeee" )
+(set-face-background hl-line-face "#fdfeca" )
 
 
 ;; show line numbers
@@ -152,7 +211,7 @@
       scroll-conservatively 5)
 
 ;; Trailing white space are banned!
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace nil)
 
 ;; Shouldn't highlight trailing spaces in terminal mode.
 (add-hook 'term-mode (lambda () (setq show-trailing-whitespace nil)))
@@ -222,15 +281,17 @@
 ;; org-bullets
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-(setq org-bullets-bullet-list '("⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞"))
+(setq org-bullets-bullet-list '(" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "))
+;; (setq org-bullets-bullet-list '("|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|" "|"))
+;; (setq org-bullets-bullet-list '("⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞" "⁞"))
 ;; ∷
 ;; (setq org-bullets-bullet-list '("➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤" "➤"))
 ;; (setq org-bullets-bullet-list '("∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵" "∵"))
 ;; (setq org-bullets-bullet-list '("⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼" "⫼"))
 
 ;; indentation
-(add-hook 'org-mode-hook (lambda () (org-indent-mode 1)))
-(setq org-indent-indentation-per-level 4)
+(add-hook 'org-mode-hook (lambda () (org-indent-mode 0)))
+(setq org-indent-indentation-per-level 0)
 (setq org-adapt-indentation nil)
 (setq org-hide-leading-starts nil)
 
@@ -286,7 +347,8 @@
 (use-package lsp-treemacs)
 
 (setq lsp-java-vmargs (list "-noverify" "-Xmx8G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication")
-      lsp-file-watch-ignored '(".idea" ".git" "build"))
+      lsp-file-watch-ignored '(".idea" ".git" "build")
+      lsp-file-watch-threshold 1000)
 
 ;; activate helm, enable helm-M-x
 (helm-mode 1)
@@ -295,6 +357,9 @@
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+;; enable git-gutter by default
+(global-git-gutter-mode 1)
 
 (require 'helm-projectile)
 (helm-projectile-on)
