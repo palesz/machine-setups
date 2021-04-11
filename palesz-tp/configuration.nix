@@ -21,21 +21,16 @@ with import <nixpkgs> {};
   nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.android_sdk.accept_license = true;
 
-  networking.hostName = "palesz-tp"; # Define your hostname.
+  networking.hostName = "palesz-tp";
   networking.networkmanager.enable = false;
 
-  # Since currently this machine is wired, let's disable the wireless access
-  # no need for it
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.wireless.enable = true;
   networking.wireless.networks = {
     palesz = {
       psk = builtins.replaceStrings ["\n"] [""] "${builtins.readFile ./secrets/wpa-palesz-psk}";
     };
   };
 
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
   networking.useDHCP = false;
   networking.interfaces.enp0s25.useDHCP = true;
   networking.interfaces.wlp3s0.useDHCP = true;
@@ -106,7 +101,7 @@ with import <nixpkgs> {};
     wget vim nano wpa_supplicant firefox restic git
     fahviewer fahcontrol bitwarden-cli wireguard
     wireguard-tools config.services.samba.package
-    tailscale home-manager
+    tailscale home-manager thinkfan exa
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -174,8 +169,8 @@ with import <nixpkgs> {};
   # services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
+  sound.enable = true;
+  hardware.pulseaudio.enable = true;
 
   # xrdp access
   services.xrdp.enable = true;
@@ -243,6 +238,7 @@ with import <nixpkgs> {};
       tmux
       tree
       htop iotop iftop nethogs ethtool iperf3
+      arandr
       gotty
       sysstat
       youtube-dl
