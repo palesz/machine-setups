@@ -83,11 +83,6 @@ with import <nixpkgs> {};
           publicKey = "0PTDsBWQLzQ5sZkWzOlwQeevPLOAMLe9Ji2l8TnwvFI=";
           allowedIPs = [ "10.100.0.2/32" ];
         }
-        {
-          # palesz-amzn-laptop
-          publicKey = "RXwMCBkBbgG6F9OUCudEsIq/6GoPY1j13AAVly6JsXg=";
-          allowedIPs = [ "10.100.0.3/32" ];
-        }
       ];
     };
   };
@@ -205,7 +200,7 @@ with import <nixpkgs> {};
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.palesz = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" /* "adbusers" */ ]; # Enable ‘sudo’ for the user. "networkmanager" ]
+    extraGroups = [ "wheel" "docker" "audio" /* "adbusers" */ ]; # Enable ‘sudo’ for the user. "networkmanager" ]
     openssh.authorizedKeys.keys = [
     ];
     shell = pkgs.fish;
@@ -237,7 +232,7 @@ with import <nixpkgs> {};
       lm_sensors
       tmux
       tree
-      htop iotop iftop nethogs ethtool iperf3
+      htop iotop iftop nethogs ethtool iperf3 speedtest-cli
       arandr
       gotty
       sysstat
@@ -284,6 +279,7 @@ with import <nixpkgs> {};
 
     programs.go.enable = true;
 
+    # fast image browser
     programs.feh.enable = true;
 
     programs.fish.enable = true;
@@ -300,7 +296,8 @@ with import <nixpkgs> {};
         cider
         slime
         adoc-mode
-        es-mode # https://github.com/dakrone/es-mode
+        # https://github.com/dakrone/es-mode
+        es-mode
         org-beautify-theme
         org-bullets
         htmlize
@@ -385,8 +382,6 @@ with import <nixpkgs> {};
       ];
     };
   };
-
-  # services.foldingathome.enable = false;
 
   # https://www.tailscale.com/kb/1063/install-nixos
   # admin console: https://login2.tailscale.io/admin

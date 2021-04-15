@@ -11,7 +11,7 @@
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "sdhci_pci" ];
   boot.initrd.kernelModules = [ "cifs" ];
   boot.kernelModules = [ "kvm-intel" "fuse" ];
-  boot.extraModulePackages = [ config.boot.kernelPackages.wireguard ];
+  boot.extraModulePackages = [ /*config.boot.kernelPackages.wireguard*/ ];
 
   fileSystems."/" = { 
       device = "/dev/disk/by-uuid/c7728e49-ca0b-48a9-a3b3-d063e43f100f";
