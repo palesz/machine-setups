@@ -79,7 +79,7 @@ with import <nixpkgs> {};
 
       peers = [
         {
-          # palesz-pixel3a
+          # pixel3a
           publicKey = "0PTDsBWQLzQ5sZkWzOlwQeevPLOAMLe9Ji2l8TnwvFI=";
           allowedIPs = [ "10.100.0.2/32" ];
         }
@@ -98,15 +98,6 @@ with import <nixpkgs> {};
     wireguard-tools config.services.samba.package
     tailscale home-manager thinkfan exa
   ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  #   pinentryFlavor = "gnome3";
-  # };
 
   virtualisation.docker.enable = true;
 
@@ -137,17 +128,6 @@ with import <nixpkgs> {};
     };
   };
 
-  services.nextcloud = {
-    enable = false; # not yet
-    package = pkgs.nextcloud20;
-    hostName = "192.168.2.45";
-    config = {
-      dbtype = "sqlite";
-      dbpass = toString ./secrets/nextcloud/dbpass;
-      adminpass = toString ./secrets/nextcloud/adminpass;
-    };
-  };
-
   services.miniflux = {
     enable = true;
     config = {
@@ -166,6 +146,7 @@ with import <nixpkgs> {};
   # Enable sound.
   sound.enable = true;
   hardware.pulseaudio.enable = true;
+  nixpkgs.config.pulseaudio = true;
 
   # xrdp access
   services.xrdp.enable = true;
@@ -200,13 +181,10 @@ with import <nixpkgs> {};
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.palesz = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "audio" /* "adbusers" */ ]; # Enable ‘sudo’ for the user. "networkmanager" ]
-    openssh.authorizedKeys.keys = [
-    ];
+    extraGroups = [ "wheel" "docker" "audio" ]; # Enable ‘sudo’ for the user. "networkmanager" ]
+    openssh.authorizedKeys.keys = [];
     shell = pkgs.fish;
   };
-
-  # programs.adb.enable = true; # Android development - https://nixos.wiki/wiki/Android
 
   home-manager.users.palesz = {pkgs, ...}: {
 
@@ -243,21 +221,17 @@ with import <nixpkgs> {};
       irssi
       exiftool
       pandoc
-      clojure
-      boot # babashka
-      leiningen
+      clojure boot leiningen # babashka
       inetutils
       vlc
       nomacs
       slack
       ffmpeg
-      # Android development - https://nixos.wiki/wiki/Android
-      # android-studio
-      # adb-sync
       qbittorrent
       qpdf qpdfview
       hexchat
       libreoffice
+      pavucontrol
       datamash gnumeric
       # python with a custom package list
       (
@@ -329,7 +303,7 @@ with import <nixpkgs> {};
         visual-regexp
         visual-regexp-steroids
         org-download
-        mixed-pitch
+        # mixed-pitch
         atomic-chrome
         git-gutter
       ];
@@ -424,7 +398,7 @@ with import <nixpkgs> {};
   system.stateVersion = "20.03"; # Did you read the comment?
 
   services.plex = {
-    enable = true;
+    enable = false;
     openFirewall = true;
   };
 
