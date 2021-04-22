@@ -148,6 +148,10 @@ with import <nixpkgs> {};
   hardware.pulseaudio.enable = true;
   nixpkgs.config.pulseaudio = true;
 
+  # bluetooth
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
   # xrdp access
   services.xrdp.enable = true;
   # services.xrdp.defaultWindowManager = "startplasma-x11";
@@ -230,6 +234,14 @@ with import <nixpkgs> {};
       qbittorrent
       qpdf qpdfview
       hexchat
+      
+      # rust development
+      rustup rust-analyzer
+      # rustfmt rustup cargo rust-analyzer
+
+      # vscode
+      vscode
+      
       libreoffice
       pavucontrol
       datamash gnumeric
