@@ -480,11 +480,21 @@ with import <nixpkgs> {};
         "force group" = "users";
       };
       data = {
-	      comment = "data folder";
+        comment = "data folder";
         path = "/data";
         public = "no";
         writable = "yes";
 	      printable = "no";
+        "create mask" = "0644";
+        "force user" = "palesz";
+        "force group" = "users";
+      };
+      syno = {
+        comment = "syno";
+        path = "/syno";
+        public = "no";
+        writable = "yes";
+        printable = "no";
         "create mask" = "0644";
         "force user" = "palesz";
         "force group" = "users";
