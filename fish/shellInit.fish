@@ -30,3 +30,13 @@ end
 
 # C-x C-e will open the $VISUAL or $EDITOR to edit the command line
 bind \cx\ce edit_command_buffer
+
+# display switch functions
+
+function display-external-only
+         xrandr --display :0.0 --output LVDS-1 --auto --off --output HDMI-1 --auto --primary --mode 1920x1080 --above LVDS-1
+end
+
+function display-internal-only
+         xrandr --display :0.0 --output LVDS-1 --auto --primary --mode 1366x768 --output HDMI-1 off
+end
