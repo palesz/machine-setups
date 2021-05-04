@@ -145,10 +145,16 @@ with import <nixpkgs> {};
 
   # Enable sound.
   sound.enable = true;
-  hardware.pulseaudio.enable = true;
+  hardware.pulseaudio = {
+    enable = true;
+    # enable bluetooth support
+    package = pkgs.pulseaudioFull;
+    extraModules = [ pkgs.pulseaudio-modules-bt ];
+  };
   nixpkgs.config.pulseaudio = true;
 
   # bluetooth
+  # https://nixos.wiki/wiki/Bluetooth
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
@@ -214,7 +220,8 @@ with import <nixpkgs> {};
       lm_sensors
       tmux
       tree
-      htop iotop iftop nethogs ethtool iperf3 speedtest-cli
+      htop iotop iftop nethogs ethtool #iperf4 speedtest-cli 
+      hdparm
       arandr
       gotty
       sysstat
