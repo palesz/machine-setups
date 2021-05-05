@@ -276,7 +276,12 @@ with import <nixpkgs> {};
     # fast image browser
     programs.feh.enable = true;
 
-    programs.fish.enable = true;
+    programs.fish = {
+      enable = true;
+      shellInit = ''
+        ${builtins.readFile ../fish/shellInit.fish}
+      '';
+    };
 
     programs.emacs = {
       enable = true;
