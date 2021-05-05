@@ -96,7 +96,8 @@ with import <nixpkgs> {};
     wget vim nano wpa_supplicant firefox restic git
     fahviewer fahcontrol bitwarden-cli wireguard
     wireguard-tools config.services.samba.package
-    tailscale home-manager thinkfan exa
+    tailscale home-manager thinkfan exa mergerfs mergerfs-tools
+    bpytop
   ];
 
   virtualisation.docker.enable = true;
