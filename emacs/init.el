@@ -296,7 +296,7 @@ This command does not push text to `kill-ring'."
 (setq org-hide-leading-starts nil)
 
 ;; enable variable pitch mode
-(add-hook 'org-mode-hook (lambda () (variable-pitch-mode 1)))
+;; (add-hook 'org-mode-hook (lambda () (variable-pitch-mode 1)))
 
 ;; emphasis markers
 (setq org-hide-emphasis-markers nil)
@@ -308,10 +308,10 @@ This command does not push text to `kill-ring'."
       org-fontify-quote-and-verse-blocks t)
 
 ;; mix pitches
-(use-package mixed-pitch
-  :hook
-  (text-mode . mixed-pitch-mode)
-  (org-mode . mixed-pitch-mode))
+;; (use-package mixed-pitch
+;;   :hook
+;;   (text-mode . mixed-pitch-mode)
+;;   (org-mode . mixed-pitch-mode))
 
 ;; Be able to change the image size
 ;; (setq org-image-actual-width 200)
