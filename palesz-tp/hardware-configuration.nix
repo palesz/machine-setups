@@ -28,53 +28,44 @@
       fsType = "ext4";
   };
 
-  fileSystems."/syno/home" = {
-      device = "//192.168.2.28/home";
-      fsType = "cifs";
-      # options = ["x-systemd.automount,uid=palesz,vers=3.0,auto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s,credentials=/etc/nixos/smb-secrets"];
-      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
+  fileSystems."/syno" = {
+      device = "palesz@192.168.2.28:/";
+      fsType = "sshfs";
+      # extra ssh options: https://linux.die.net/man/5/ssh_config
+      options = ["x-systemd.automount,gid=users,uid=palesz,auto,identityfile=/home/palesz/.ssh/id_rsa,allow_other"];
   };
-
-  fileSystems."/syno/homes" = {
-      device = "//192.168.2.28/homes";
-      fsType = "cifs";
-      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
-  };
-
-  fileSystems."/syno/archive" = {
-      device = "//192.168.2.28/archive";
-      fsType = "cifs";
-      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
-  };
-
-  fileSystems."/syno/media1" = {
+  
+  fileSystems."/mnt/syno-smb/media1" = {
       device = "//192.168.2.28/media1";
       fsType = "cifs";
       options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
   };
-
-  fileSystems."/syno/media2" = {
+  
+  fileSystems."/mnt/syno-smb/media2" = {
       device = "//192.168.2.28/media2";
       fsType = "cifs";
       options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
   };
 
-  fileSystems."/syno/data" = {
-      device = "//192.168.2.28/data";
-      fsType = "cifs";
-      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
-  };
-
-  fileSystems."/syno/surveillance" = {
+  fileSystems."/mnt/syno-smb/surveillance" = {
       device = "//192.168.2.28/surveillance";
       fsType = "cifs";
       options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
   };
 
- swapDevices =
-    [ { device = "/dev/disk/by-uuid/ecf24fbf-7da7-41ea-9a3d-0d7207011e3e"; }
-    ];
+  fileSystems."/mnt/syno-smb/archive" = {
+      device = "//192.168.2.28/archive";
+      fsType = "cifs";
+      options = ["x-systemd.automount,gid=users,uid=palesz,vers=3.0,auto,credentials=/etc/nixos/secrets/smb-secrets,file_mode=0757,dir_mode=0757"];
+  };
+
+  swapDevices = [ 
+    { device = "/dev/disk/by-uuid/ecf24fbf-7da7-41ea-9a3d-0d7207011e3e"; }
+  ];
 
   nix.maxJobs = lib.mkDefault 4;
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  powerManagement = {
+    enable = true;
+    cpuFreqGovernor = lib.mkDefault "ondemand";
+  };
 }

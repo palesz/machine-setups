@@ -17,6 +17,8 @@ with import <nixpkgs> {};
 
   # Use the GRUB 2 boot loader.
   boot.loader.systemd-boot.enable = true;
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+  boot.kernel.sysctl."net.ipv6.conf.all.forwarding" = 1;
 
   nixpkgs.config.allowUnfree = true;
   # nixpkgs.config.android_sdk.accept_license = true;
@@ -24,10 +26,16 @@ with import <nixpkgs> {};
   networking.hostName = "palesz-tp";
   networking.networkmanager.enable = false;
 
-  networking.wireless.enable = true;
-  networking.wireless.networks = {
-    palesz = {
-      psk = builtins.replaceStrings ["\n"] [""] "${builtins.readFile ./secrets/wpa-palesz-psk}";
+  networking.wireless = {
+    enable = true;
+    interfaces = [ "wlp3s0" ];
+    networks = {
+      "palesz" = {
+        psk = builtins.replaceStrings ["\n"] [""] "${builtins.readFile ./secrets/wpa-palesz-psk}";
+      };
+      "palesz-5G" = {
+        psk = builtins.replaceStrings ["\n"] [""] "${builtins.readFile ./secrets/wpa-palesz-psk}";
+      };
     };
   };
 
@@ -44,13 +52,12 @@ with import <nixpkgs> {};
     allowPing = false;
     allowedTCPPorts = [
       22 # ssh
-      32400 # plex
+      # 32400 # plex
       445 139 # samba
-      3389 # xrdp
-      58080 # http server
-      18080 # http server
-      58443 # https server
-      5601 # kibana
+      # 3389 # xrdp
+      # 58080 # http server
+      # 18080 # http server
+      # 58443 # https server
       8080 # miniflux
       22000 # syncthing tcp
     ];
@@ -97,7 +104,7 @@ with import <nixpkgs> {};
     fahviewer fahcontrol bitwarden-cli wireguard
     wireguard-tools config.services.samba.package
     tailscale home-manager thinkfan exa mergerfs mergerfs-tools
-    bpytop
+    bpytop ffmpeg parted usbutils sshfs rclone rclone-browser
   ];
 
   virtualisation.docker.enable = true;
@@ -141,8 +148,10 @@ with import <nixpkgs> {};
     enable = true;
   };
 
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
+  # torrent section
+  services.jackett.enable = true;
+  services.sonarr.enable = true;
+  services.radarr.enable = true;
 
   # Enable sound.
   sound.enable = true;
@@ -160,7 +169,7 @@ with import <nixpkgs> {};
   services.blueman.enable = true;
 
   # xrdp access
-  services.xrdp.enable = true;
+  services.xrdp.enable = false;
   # services.xrdp.defaultWindowManager = "startplasma-x11";
   services.xrdp.defaultWindowManager = "${pkgs.i3}/bin/i3";
 
@@ -214,34 +223,34 @@ with import <nixpkgs> {};
     services.syncthing.enable = true;
 
     home.packages = with pkgs; [
-      adobe-reader
-      pdftk
+      adobe-reader scribus pdftk inkscape
       brave
       bitwarden-cli
       lm_sensors
       tmux
       tree
-      htop iotop iftop nethogs ethtool #iperf4 speedtest-cli 
+      htop iotop iftop nethogs ethtool speedtest-cli wireshark iperf3
       hdparm
       arandr
       gotty
       sysstat
       youtube-dl
       nmap
-      mc
+      mc krusader mucommander
       gimp
       irssi
       exiftool
       pandoc
       clojure boot leiningen # babashka
       inetutils
-      vlc
+      vlc smplayer mplayer
       nomacs
-      slack
       ffmpeg
       qbittorrent
-      qpdf qpdfview
+      qpdf qpdfview okular
       hexchat
+      obs-studio
+      hardlink rdfind
       
       # rust development
       rustup rust-analyzer
@@ -251,7 +260,7 @@ with import <nixpkgs> {};
       vscode
       
       libreoffice
-      pavucontrol
+      pavucontrol # audio control
       datamash gnumeric
       # python with a custom package list
       (
@@ -414,6 +423,46 @@ with import <nixpkgs> {};
     };
   };
 
+  # restic prune setup
+  systemd.services."restic-prune" = {
+    description = "Service that prunes the restic repository";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    path = [ pkgs.restic ];
+    restartIfChanged = false;
+    serviceConfig = {
+      Type = "simple";
+      User = "palesz";
+      ExecStart = "/bin/sh restic prune --repo /mnt/syno-smb/archive/restic_repo/ --max-repack-size 100g --password-file /etc/nixos/secrets/restic-password";
+    };
+  };
+  systemd.timers."restic-prune" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "0/2:47:00";
+    };
+  };
+
+  # saving the Mikrotik router configuration
+  systemd.services."mikrotik-export" = {
+    description = "Export the current Mikrotik configuration as a backup";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    path = [ pkgs.openssh ];
+    restartIfChanged = false;
+    serviceConfig = {
+      Type = "simple";
+      User = "palesz";
+      ExecStart = "/bin/sh /home/palesz/Mikrotik/mikrotik-config-export.sh";
+    };
+  };
+  systemd.timers."mikrotik-export" = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "Sun 05:00:00";
+    };
+  };
+
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
@@ -424,6 +473,11 @@ with import <nixpkgs> {};
 
   services.plex = {
     enable = false;
+    openFirewall = true;
+  };
+
+  services.jellyfin = {
+    enable = true;
     openFirewall = true;
   };
 
@@ -446,18 +500,19 @@ with import <nixpkgs> {};
       user = "root";
       email = "palesz@gmail.com";
       passwordFile = ./secrets/bitwarden-palesz;
-      outputFile = "/syno/homes/palesz/bitwarden/export.json";
+      outputFile = "/home/palesz/bitwarden/palesz/export.json";
     };
     monica = {
       user = "root";
       email = "monica.ana@gmail.com";
       passwordFile = ./secrets/bitwarden-monica;
-      outputFile = "/syno/homes/monica/bitwarden/export.json";
+      outputFile = "/home/palesz/bitwarden/monica/export.json";
     };
   };
 
   services.printing = {
     enable = true;
+    drivers = [ canon-cups-ufr2 carps-cups cups-bjnp gutenprint ];
   };
 
   # you have to add the user with smbpasswd -a [username]
